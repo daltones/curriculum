@@ -1,0 +1,14 @@
+{
+  "name": "daltones-curriculum",
+  "version": "1.0.0",
+  "description": "Meu currículo :)",
+  "repository": "https://github.com/daltones/curriculum",
+  "author": "Dalton Santos <daltones@msn.com>",
+  "devDependencies": {
+    "github-markdown-css": "^2.4.1",
+    "markdown-it": "^8.3.1",
+    "markdown-it-emoji": "^1.3.0",
+    "twemoji": "^2.2.5",
+    "wkhtmltopdf": "^0.3.4"
+  }
+}

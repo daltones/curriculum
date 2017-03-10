@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+
+const MarkdownIt = require('markdown-it');
+const MarkdownItEmoji = require('markdown-it-emoji');
+const Twemoji = require('twemoji');
+const wkhtmltopdf = require('wkhtmltopdf');
+
+
+const curriculumContent = fs.readFileSync(path.join(__dirname, 'curriculum.md')).toString();
+const readmeHeaderContent = fs.readFileSync(path.join(__dirname, 'readme-header.md')).toString();
+
+
+function generateReadmeMd() {
+  fs.writeFileSync(path.join(__dirname, 'README.md'), `${readmeHeaderContent}\n${curriculumContent}`);
+}
+
+function generateCurriculumPdf() {
+  const twemojiOptions = {
+    base: `${path.dirname(require.resolve('twemoji'))}/`,
+    folder: 'svg',
+    ext: '.svg',
+  };
+
+  const md = new MarkdownIt({html: true});
+  md.use(MarkdownItEmoji);
+  md.renderer.rules.emoji = function (token, idx) {
+    return Twemoji.parse(token[idx].content, twemojiOptions);
+  };
+
+  const rendered = md.render(curriculumContent);
+  const html = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Currículo — Dalton Erasmo dos Santos</title>
+<link href="${require.resolve('github-markdown-css/github-markdown.css')}" rel="stylesheet" type="text/css">
+<style tyle="text/css">
+img.emoji {
+  height: 1em;
+  width: 2em; /* Whaaaaat */
+  vertical-align: middle;
+}
+</style>
+</head>
+<body class="markdown-body">
+${rendered}
+</body>
+</html>
+`;
+
+  fs.writeFileSync(path.join(__dirname, 'curriculum.html'), html);
+
+  wkhtmltopdf(html, {
+    output: path.join(__dirname, 'curriculum.pdf'),
+    pageSize: 'A4',
+    marginTop: '15mm',
+    marginRight: '15mm',
+    marginBottom: '15mm',
+    marginLeft: '15mm',
+  });
+}
+
+
+generateReadmeMd();
+generateCurriculumPdf();
